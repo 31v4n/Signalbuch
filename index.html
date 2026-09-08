@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DB Signal-Lernportal: Moderne Ks-Signale</title>
+    <style>
+        :root {
+            --bg-main: #0a0f1d;
+            --bg-card: #131a30;
+            --bg-card-hover: #1b2542;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent-db: #ec0016;
+            --signal-green: #00ff66;
+            --signal-yellow: #ffcc00;
+            --signal-red: #ff3333;
+            --signal-white: #ffffff;
+            --border-glow: rgba(236, 0, 22, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #9ca3af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .db-badge {
+            display: inline-block;
+            background-color: var(--accent-db);
+            color: white;
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent-db);
+            border-color: var(--accent-db);
+            box-shadow: 0 4px 15px rgba(236, 0, 22, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .signal-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .signal-card:hover {
+            transform: translateY(-5px);
+            background: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .signal-visual-box {
+            background: linear-gradient(180deg, #1e294b 0%, #0f172a 100%);
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 240px;
+        }
+
+        /* Modernized Semi-3D Signal Graphics via CSS */
+        .signal-post {
+            position: relative;
+            width: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .signal-head {
+            width: 44px;
+            height: 90px;
+            background: #1e1e1e;
+            border-radius: 22px 22px 4px 4px;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.2), 0 4px 10px rgba(0,0,0,0.5);
+            padding: 8px;
+            display: grid;
+            grid-template-rows: repeat(3, 1fr);
+            justify-items: center;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .signal-head::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px 5px 0;
+            border-style: solid;
+            border-color: #1e1e1e transparent;
+        }
+
+        .light-opt {
+            width: 18px;
+            height: 18px;
+            background: #111;
+            border-radius: 50%;
+            box-shadow: inset 0 2px 3px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        /* Light states with realistic glow */
+        .light-opt.red {
+            background: #ff3333;
+            box-shadow: 0 0 15px #ff3333, inset 0 2px 2px white;
+        }
+        .light-opt.green {
+            background: #00ff66;
+            box-shadow: 0 0 15px #00ff66, inset 0 2px 2px white;
+        }
+        .light-opt.yellow {
+            background: #ffcc00;
+            box-shadow: 0 0 15px #ffcc00, inset 0 2px 2px white;
+        }
+        .light-opt.white-blink {
+            background: #ffffff;
+            box-shadow: 0 0 15px #ffffff, inset 0 2px 2px white;
+            animation: blink 1s infinite steps(2, start);
+        }
+        .light-opt.yellow-v {
+            background: #ffcc00;
+            box-shadow: 0 0 10px #ffcc00;
+        }
+
+        /* Matrix indicator for Zs3 / Zs3v */
+        .matrix-indicator {
+            position: absolute;
+            top: -24px;
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .matrix-indicator.active-v { color: #ffcc00; text-shadow: 0 0 5px #ffcc00; }
+        .matrix-indicator.active-m { color: #00ff66; text-shadow: 0 0 5px #00ff66; }
+
+        /* Additional Lights */
+        .zusatz-licht {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #111;
+        }
+        .zusatz-licht.top-left.active {
+            background: #fff;
+            box-shadow: 0 0 6px #fff;
+            top: 12px; left: 6px;
+            z-index: 3;
+        }
+        .zusatz-licht.bottom-left.active {
+            background: #fff;
+            box-shadow: 0 0 6px #fff;
+            bottom: 12px; left: 6px;
+            z-index: 3;
+        }
+
+        /* Mast with color plates */
+        .mast {
+            width: 6px;
+            height: 100px;
+            background: #4b5563;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mast-plate {
+            position: absolute;
+            top: 15px;
+            width: 10px;
+            left: -2px;
+            height: 50px;
+            background: white;
+            border-left: 2px solid red;
+            border-right: 2px solid red;
+        }
+
+        .mast-plate.yellow-triangle {
+            position: absolute;
+            bottom: 20px;
+            left: -5px;
+            width: 16px;
+            height: 16px;
+            background: #ffcc00;
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+            border: none;
+        }
+
+        .signal-info {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .signal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .signal-subtitle {
+            font-size: 0.9rem;
+            color: var(--accent-db);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+        .signal-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        @keyframes blink {
+            to { visibility: hidden; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body { padding: 1rem; }
+            header h1 { font-size: 2rem; }
+        }
+		a{
+			color:inherit;
+			text-decoration:none;
+		}
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="db-badge"><a href="teams.html">DB</a> TRAINING</div>
+        <h1>NextGen Signalbuch</h1>
+        <p>Interaktive Wissensvermittlung für die moderne Bahn. Intuitiv, lebendig und praxisnah.</p>
+    </header>
+
+    <div class="filter-container">
+        <button class="filter-btn active" onclick="filterSignals('all')">Alle Signale</button>
+        <button class="filter-btn" onclick="filterSignals('haupt')">Hauptsignale (Hp/Ks)</button>
+        <button class="filter-btn" onclick="filterSignals('zusatz')">Zusatzsignale (Zs)</button>
+        <button class="filter-btn" onclick="filterSignals('rangier')">Rangiersignale (Sh)</button>
+    </div>
+
+    <div class="signals-grid">
+
+        <!-- Card 1: Hp 0 -->
+        <div class="signal-card" data-type="haupt">
+            <div class="signal-visual-box">
+                <div class="signal-post">
+                    <div class="signal-head"><div class="light-opt red"></div><div class="light-opt"></div><div class="light-opt"></div></div>
+                    <div class="mast"><div class="mast-plate"></div></div>
+                </div>
+                <div class="signal-post">
+                    <div class="signal-head"><div class="light-opt red"></div><div class="light-opt"></div><div class="light-opt"></div></div>
+                    <div class="mast"><div class="mast-plate"></div></div>
+                </div>
+            </div>
+            <div class="signal-info">
+                <div class="signal-title">Hp 0</div>
+                <div class="signal-subtitle">Halt</div>
+                <div class="signal-description">Das Signal gilt für Zug- und Rangierfahrten. Absolutes Fahrverbot.</div>
+            </div>
+        </div>
+
+        <!-- Card 2: Ks 1 (Fahrt) -->
+        <div class="signal-card" data-type="haupt">
+            <div class="signal-visual-box">
+                <div class="signal-post">
+                    <div class="signal-head"><div class="light-opt"></div><div class="light-opt green"></div><div class="light-opt"></div></div>
+                    <div class="mast"><div class="mast-plate"></div></div>
+                </div>
+            </div>
+            <div class="signal-info">
+                <div class="signal-title">Ks 1</div>
+                <div class="signal-subtitle">Fahrt</div>
+                <div class="signal-description">Fahrt mit zulässiger Fahrplangeschwindigkeit erlaubt.</div>
+            </div>
+        </div>
+
+        <!-- Card 3: Ks 1 (Blinklicht) -->
+        <div class="signal-card" data-type="haupt zusatz">
+            <div class="signal-visual-box">
+                <div class="signal-post">
+                    <div class="matrix-indicator active-v">4</div>
+                    <div class="signal-head"><div class="light-opt"></div><div class="light-opt green" style="animation: blink 1s infinite steps(2, start);"></div><div class="light-opt"></div></div>
+                    <div class="mast"><div class="mast-plate"></div><div class="mast-plate yellow-triangle"></div></div>
+                </div>
+            </div>
+            <div class="signal-info">
+                <div class="signal-title">Ks 1 (Blinkend) + Zs 3v</div>
+                <div class="signal-subtitle">Fahrt, Halt/Geschwindigkeitsbeschränkung erwarten</div>
+                <div class="signal-description">Grünes Blinklicht, wenn ein Zs 3v (Geschwindigkeitsvoranzeiger) gezeigt wird. Kennziffern 1-15 möglich.</div>
+            </div>
+        </div>
+
+        <!-- Card 4: Ks 2 -->
+        <div class="signal-card" data-type="haupt">
+            <div class="signal-visual-box">
+                <div class="signal-post">
+                    <div class="signal-head"><div class="light-opt"></div><div class="light-opt"></div><div class="light-opt yellow"></div></div>
+                    <div class="mast"><div class="mast-plate"></div><div class="mast-plate yellow-triangle"></div></div>
+                </div>
+            </div>
+            <div class="signal-info">
+                <div class="signal-title">Ks 2</div>
+                <div class="signal-subtitle">Halt erwarten</div>
+                <div class="signal-description">Vorbeifahrt erlaubt - kündigt einen Halt am nächsten Hauptsignal an.</div>
+            </div>
+        </div>
+
+        <!-- Card 5: Verkürzter Bremsweg -->
+        <div class="signal-card" data-type="haupt">
+            <div class="signal-visual-box">
+                <div class="signal-post">
+                    <div class="signal-head">
+                        <div class="zusatz-licht top-left active"></div>
+                        <div class="light-opt"></div><div class="light-opt"></div><div class="light-opt yellow"></div>
+                    </div>
+                    <div class="mast"><div class="mast-plate"></div></div>
+                </div>
+            </div>
+            <div class="signal-info">
+                <div class="signal-title">Ks-Signal (Zusatzlicht oben)</div>
+                <div class="signal-subtitle">Verkürzter Bremsweg</div>
+                <div class="signal-description">Zeigt bei um mehr als 5% verkürztem Bremsweg vor dem zugehörigen Signal ein weißes Zusatzlicht oben links.</div>
+            </div>
+        </div>
+
+        <!-- Card 6: Zs 1 Ersatzsignal -->
+        <div class="signal-card" data-type="haupt zusatz">
+            <div class="signal-visual-box">
+                <div class="signal-post">
+                    <div class="signal-head"><div class="light-opt red"></div><div class="light-opt white-blink" style="position:absolute; bottom: 12px; left: 10px; width:10px; height:10px;"></div><div class="light-opt"></div></div>
+                    <div class="mast"><div class="mast-plate"></div></div>
+                </div>
+            </div>
+            <div class="signal-info">
+                <div class="signal-title">Hp 0 + Zs 1</div>
+                <div class="signal-subtitle">Ersatzsignal</div>
+                <div class="signal-description">Ein weißes Blinklicht am haltzeigenden oder gestörten Hauptsignal. Erlaubt die Vorbeifahrt ohne schriftlichen Befehl.</div>
+            </div>
+        </div>
+
+        <!-- Card 7: Zs 7 Vorsichtsignal -->
+        <div class="signal-card" data-type="haupt zusatz">
+            <div class="signal-visual-box">
+                <div class="signal-post">
+                    <div class="signal-head">
+                        <div class="light-opt red"></div>
+                        <div style="display:flex; gap:2px; justify-content:center; width:100%;">
+                            <div class="light-opt yellow-v" style="width:6px; height:6px;"></div>
+                            <div class="light-opt yellow-v" style="width:6px; height:6px;"></div>
+                        </div>
+                        <div class="light-opt yellow-v" style="width:6px; height:6px; margin-top:-4px;"></div>
+                    </div>
+                    <div class="mast"><div class="mast-plate"></div></div>
+                </div>
+            </div>
+            <div class="signal-info">
+                <div class="signal-title">Hp 0 + Zs 7</div>
+                <div class="signal-subtitle">Vorsichtsignal</div>
+                <div class="signal-description">Drei gelbe Lichter in Form eines "V". Fahrt auf Sicht bis zum nächsten Signal erlaubt.</div>
+            </div>
+        </div>
+
+        <!-- Card 8: Sh 1 -->
+        <div class="signal-card" data-type="rangier">
+            <div class="signal-visual-box">
+                <div class="signal-post">
+                    <div class="signal-head">
+                        <div class="light-opt red"></div>
+                        <div style="position:absolute; bottom: 8px; left:6px; display:flex; transform: rotate(45deg); gap: 4px;">
+                            <div class="light-opt" style="background:#fff; width:6px; height:6px; box-shadow:0 0 5px #fff;"></div>
+                            <div class="light-opt" style="background:#fff; width:6px; height:6px; box-shadow:0 0 5px #fff;"></div>
+                        </div>
+                    </div>
+                    <div class="mast"><div class="mast-plate"></div></div>
+                </div>
+            </div>
+            <div class="signal-info">
+                <div class="signal-title">Hp 0 + Sh 1</div>
+                <div class="signal-subtitle">Fahrverbot aufgehoben</div>
+                <div class="signal-description">Zwei weiße Lichter nach rechts oben ansteigend. Gilt speziell für Rangierfahrten.</div>
+            </div>
+        </div>
+
+        <!-- Card 9: Zs 3 Geschwindigkeitsanzeiger -->
+        <div class="signal-card" data-type="zusatz">
+            <div class="signal-visual-box">
+                <div class="signal-post">
+                    <div class="matrix-indicator active-m">4</div>
+                    <div class="signal-head"><div class="light-opt"></div><div class="light-opt green"></div><div class="light-opt"></div></div>
+                    <div class="mast"><div class="mast-plate"></div></div>
+                </div>
+            </div>
+            <div class="signal-info">
+                <div class="signal-title">Signal Zs 3</div>
+                <div class="signal-subtitle">Geschwindigkeitsanzeiger</div>
+                <div class="signal-description">Die durch die Kennziffer angezeigte Geschwindigkeit (z.B. 4 = 40 km/h) darf ab dem Signal im anschließenden Weichenbereich nicht überschritten werden.</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function filterSignals(type) {
+            // Update active state of buttons
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Filter elements
+            const cards = document.querySelectorAll('.signal-card');
+            cards.forEach(card => {
+                if (type === 'all') {
+                    card.style.display = 'flex';
+                } else {
+                    const types = card.getAttribute('data-type').split(' ');
+                    if (types.includes(type)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

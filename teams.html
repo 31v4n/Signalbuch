@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teams Mockup</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: #0d0d0d;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        /* --- LEFT APPS SIDEBAR --- */
+        .sidebar-apps {
+            width: 68px;
+            background-color: #141414;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 12px;
+            border-right: 1px solid #1f1f1f;
+            z-index: 10;
+        }
+
+        .avatar-profile {
+            width: 32px;
+            height: 32px;
+            background-color: #f1c9aa;
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .app-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px 0;
+            color: #a6a6a6;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        .app-item:hover {
+            color: #ffffff;
+        }
+
+        .app-item.active {
+            color: #7b83eb;
+            position: relative;
+        }
+
+        .app-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 6px;
+            bottom: 6px;
+            width: 3px;
+            background-color: #7b83eb;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .app-icon {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        /* --- CHAT LIST PANEL --- */
+        .chat-list-panel {
+            width: 320px;
+            background-color: #141414;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #252525;
+            position: relative;
+        }
+
+        .panel-header {
+            padding: 16px 16px 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            color: #adadad;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 6px;
+            padding: 0 12px 12px 12px;
+        }
+
+        .action-chip {
+            background-color: #292929;
+            border: 1px solid #2e2e2e;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #d1d1d1;
+            display: flex;
+			flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .action-chip:hover {
+            background-color: #2e2e2e;
+        }
+
+        .section-title {
+            padding: 10px 16px 6px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #a6a6a6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-items-container {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .chat-item:hover {
+            background-color: #1f1f1f;
+        }
+
+        .chat-item.active {
+            background-color: #242424;
+        }
+
+        .avatar-container {
+            position: relative;
+            margin-right: 12px;
+        }
+
+        .avatar {
+			width: 36px;
+			height: 36px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			
+			/* Schneider das Bild exakt auf die Kreisform zu */
+			overflow: hidden; 
+			position: relative;
+		}
+		
+		.avatar img.profile {
+			width: 100%;
+			height: 100%;
+			object-fit: cover; /* Verhindert ein Verzerrung/Stauchen des Bildes */
+			transform: translate(0,0)
+		}
+
+        .avatar-lg { background-color: #f1c9aa; }
+        .avatar-jf { background-color: #f9e2ae; }
+
+        .status-badge {
+            position: absolute;
+            bottom: -1px;
+            right: -1px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #f5b041;
+            border: 2px solid #141414;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: #000;
+        }
+
+        .chat-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .chat-name-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 13px;
+        }
+
+        .chat-time {
+            font-size: 11px;
+            color: #8a8a8a;
+        }
+
+        .chat-preview {
+            color: #adadad;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .show-more {
+            padding: 12px 16px;
+            color: #7b83eb;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .new-chat-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #7b83eb;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+        }
+
+        /* --- MAIN CHAT AREA --- */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #000000;
+        }
+
+        .chat-header {
+            height: 52px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #1a1a1a;
+            background-color: #0d0d0d;
+        }
+
+        .chat-header-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-status-text {
+            font-size: 11px;
+            color: #8a8a8a;
+            margin-top: 1px;
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 18px;
+            color: #d1d1d1;
+            font-size: 16px;
+            align-items: center;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .timestamp-divider {
+            text-align: center;
+            font-size: 11px;
+            color: #8a8a8a;
+            margin: 15px 0;
+        }
+
+        .message-row {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 2px;
+        }
+
+        .message-row.sent {
+            align-items: flex-end;
+        }
+
+        .message-row.received {
+            align-items: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 60%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .sent .message-bubble {
+            background-color: #5b5fc7;
+            color: #ffffff;
+            border-bottom-right-radius: 2px;
+        }
+
+        .received .message-bubble {
+            background-color: #292929;
+            color: #ffffff;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 2px;
+            font-size: 10px;
+            color: #8a8a8a;
+        }
+
+        .chat-input-area {
+            padding: 12px 20px 20px 20px;
+            background-color: #000000;
+        }
+
+        .input-wrapper {
+            background-color: #1f1f1f;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            padding: 4px 12px;
+            border: 1px solid #2e2e2e;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #7b83eb;
+        }
+
+        .add-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #5b5fc7;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+
+        .chat-input::placeholder {
+            color: #8a8a8a;
+        }
+
+        .input-icons {
+            display: flex;
+            gap: 12px;
+            color: #a6a6a6;
+            font-size: 16px;
+            align-items: center;
+        }
+
+        .input-icons span {
+            cursor: pointer;
+        }
+
+        .input-icons span:hover {
+            color: #fff;
+        }
+		
+		img{
+			width:50%;
+			height:auto;
+			transform: translate(50%,0%)
+		}
+    </style>
+</head>
+<body id="bod">
+
+    <!-- 1. LINKS SEITENLEISTE (APPS) -->
+    <div class="sidebar-apps">
+        <div class="avatar-profile" id="IK">IK</div>
+        
+        <div class="app-item">
+            <span class="app-icon"><img src="grafics/activities.png"></span>
+            <span>Aktivität</span>
+        </div>
+        <div class="app-item">
+            <span class="app-icon"><img src="grafics/planer.png"></span>
+            <span>Planner</span>
+        </div>
+        <div class="app-item">
+            <span class="app-icon"><img src="grafics/approval.png"></span>
+            <span>Genehmigu...</span>
+        </div>
+        <div class="app-item active">
+            <span class="app-icon"><img src="grafics/chat.png"></span>
+            <span>Chat</span>
+        </div>
+        <div class="app-item">
+            <span class="app-icon"><img src="grafics/Kalendar.png"></span>
+            <span>Kalender</span>
+        </div>
+        <div class="app-item">
+            <span class="app-icon"><img src="grafics/more.png"></span>
+            <span>Mehr</span>
+        </div>
+    </div>
+
+    <!-- 2. CHAT-LISTE (MITTLERE SPALTE) -->
+    <div class="chat-list-panel">
+        <div class="panel-header">
+            <span class="panel-title">Chat</span>
+            <div class="header-actions">
+                <span>🌈</span>
+                <span>🔍</span>
+                <span>•••</span>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <div class="action-chip"><div><img src="grafics/aufholen.png"></div> Aufholen</div>
+            <div class="action-chip"><span><img src="grafics/recent.png"></span> Aktuell</div>
+            <div class="action-chip"><span><img src="grafics/ungelesen.png"></span> Ungelesen</div>
+            <div class="action-chip"><span><img src="grafics/discover.png"></span> Entdeck...</div>
+        </div>
+
+        <div class="section-title">
+            <span>˅ Chats</span>
+            <span style="cursor: pointer;">•••</span>
+        </div>
+
+        <div class="chat-items-container">
+            <div class="chat-item active">
+                <div class="avatar-container">
+                    <div class="avatar avatar-lg" style="width:32px; height:32px; font-size:11px;"><img class="profile" src="grafics/elias.jpg"></div>
+                    <div class="status-badge">🕒</div>
+                </div>
+                <div class="chat-info">
+                    <div class="chat-name-row">
+                        <span class="chat-name">Franziska Elias</span>
+                        <span class="chat-time" id="sidebar-lg-time">13:07</span>
+                    </div>
+                    <div class="chat-preview" id="sidebar-lg-preview">e</div>
+                </div>
+            </div>
+			
+			<div class="chat-item">
+                <div class="avatar-container">
+                    <div class="avatar avatar-jf">LG</div>
+                    <div class="status-badge">🕒</div>
+                </div>
+                <div class="chat-info">
+                    <div class="chat-name-row">
+                        <span class="chat-name" contenteditable="true">Lalex Galex</span>
+                        <span class="chat-time">12:43</span>
+                    </div>
+                    <div class="chat-preview">Sie: </div>
+                </div>
+            </div>
+
+            <div class="chat-item">
+                <div class="avatar-container">
+                    <div class="avatar avatar-jf">JF</div>
+                    <div class="status-badge">🕒</div>
+                </div>
+                <div class="chat-info">
+                    <div class="chat-name-row">
+                        <span class="chat-name" contenteditable="true">Jalex Falex</span>
+                        <span class="chat-time">12:43</span>
+                    </div>
+                    <div class="chat-preview">Sie: </div>
+                </div>
+            </div>
+
+            <div class="show-more">Mehr anzeigen</div>
+        </div>
+
+        <div class="new-chat-btn">✏️</div>
+    </div>
+
+    <!-- 3. HAUPT-CHATBEREICH -->
+    <div class="chat-area">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="chat-header-user">
+                <div class="avatar-container">
+                    <div class="avatar avatar-lg" style="width:32px; height:32px; font-size:11px;"><img class="profile" src="grafics/elias.jpg"></div>
+                    <div class="status-badge" style="width:10px; height:10px; font-size:6px;">🕒</div>
+                </div>
+                <div>
+                    <div style="font-weight: 600; font-size: 14px;">Franziska Elias</div>
+                    <div class="header-status-text">Zuletzt online: 13:11</div>
+                </div>
+            </div>
+            <div class="chat-header-actions">
+                <span style="width:50%;"><img src="grafics/atop.png"></span>
+                <span style="width:50%;"><img src="grafics/btop.png"></span>
+                <span style="width:50%;"><img src="grafics/ctop.png"></span>
+            </div>
+        </div>
+
+        <!-- Nachrichten-Verlauf -->
+        <div class="messages-container" id="messages-container">
+            <div class="timestamp-divider">Gestern 18:42</div>
+
+            <!-- Vorherige empfangene Test-Nachrichten (wie im Bild) -->
+            <div class="message-row received">
+                <div class="message-bubble">Hallo Ivan, ich bitte dich deine E-mail Signatur zu korrigieren. Nimm dazu bitte entweder Kontakt mit Hernn Kuyateh oder der DB-IT auf!</div>
+            </div>
+			
+			<div class="timestamp-divider" id="chat-divider-date">Heute 12:42</div>
+        </div>
+
+        <!-- Eingabefeld -->
+        <div class="chat-input-area">
+            <div class="input-wrapper">
+                <div class="add-btn">+</div>
+                <input type="text" id="chat-input" class="chat-input" placeholder="Geben Sie eine Nachricht ein" autocomplete="off">
+                <div class="input-icons">
+                    <span>😊</span>
+                    <span>📷</span>
+                    <span>🎙️</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT KONFIGURATION & LOGIK -->
+    <script>
+	function updateChatDividerTime() {
+		// Das Element anhand seiner ID greifen
+		const divider = document.getElementById('chat-divider-date');
+		
+		if (!divider) return; // Abbrechen, falls das Element nicht existiert
+
+		// Aktuelle Uhrzeit ermitteln und auf 2 Stellen formatieren (z. B. "14:05")
+		const now = new Date();
+		const hours = String(now.getHours()).padStart(2, '0');
+		const minutes = String(now.getMinutes()).padStart(2, '0');
+		const timeString = `${hours}:${minutes}`;
+
+		// "Heute" durch die aktuelle Uhrzeit ersetzen
+		// (Behält z. B. " 12:42" bei oder ersetzt es flexibel)
+		divider.textContent = "Heute: " + timeString;
+	}
+	
+	
+	
+        // --- SCRIPT KONFIGURATION ---
+        const AUTO_REPLY_DELAY_MS = 60000; // Zeitintervall für Antwort (60000 ms = 1 Minute)
+        const FIXED_REPLY_TEXT = "Ivan, ich werde das deinem AFK melden. Was Liam anbelangt, er kann gerne zu mir kommen."; // Festdefinierte Antwort
+        // -----------------------------
+
+        const chatInput = document.getElementById('chat-input');
+        const messagesContainer = document.getElementById('messages-container');
+        const sidebarPreview = document.getElementById('sidebar-lg-preview');
+        const sidebarTime = document.getElementById('sidebar-lg-time');
+
+        // Hilfsfunktion: Aktuelle Uhrzeit im HH:MM Format holen
+        function getCurrentTimeString() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // Nachricht zum Chat hinzufügen
+        function addMessage(text, type) {
+            const timeStr = getCurrentTimeString();
+            
+            const messageRow = document.createElement('div');
+            messageRow.classList.add('message-row', type);
+
+            const bubble = document.createElement('div');
+            bubble.classList.add('message-bubble');
+            bubble.textContent = text;
+            messageRow.appendChild(bubble);
+
+            // Häkchen bei gesendeten Nachrichten
+            if (type === 'sent') {
+                const meta = document.createElement('div');
+                meta.classList.add('message-meta');
+                meta.innerHTML = `<span>✓</span>`;
+                messageRow.appendChild(meta);
+            }
+
+            messagesContainer.appendChild(messageRow);
+            
+            // Automatisch nach unten scrollen
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Chat-Vorschau in der linken Leiste aktualisieren
+            sidebarPreview.textContent = type === 'sent' ? `Sie: ${text}` : text;
+            sidebarTime.textContent = timeStr;
+        }
+
+        // Event-Listener für Eingabetaste (Enter)
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && chatInput.value.trim() !== '') {
+                const userMessage = chatInput.value.trim();
+                
+                // 1. Eigene Nachricht absenden
+                addMessage(userMessage, 'sent');
+                chatInput.value = '';
+
+                // 2. Automatische Antwort nach eingeestelltem Zeitintervall
+                setTimeout(() => {
+                    addMessage(FIXED_REPLY_TEXT, 'received');
+                }, AUTO_REPLY_DELAY_MS);
+				updateChatDividerTime()
+            }
+        });
+    </script>
+	
+	<script>
+		const element = document.getElementById('IK');
+		const body = document.getElementById('bod');
+
+		function toggleFullscreen() {
+		  if (!document.fullscreenElement) {
+			// Element in den Vollbildmodus bringen
+			if (body.requestFullscreen) {
+			  body.requestFullscreen();
+			} else if (body.webkitRequestFullscreen) { /* Safari / iOS Unterstützung */
+			  body.webkitRequestFullscreen();
+			} else if (body.msRequestFullscreen) { /* IE11 */
+			  body.msRequestFullscreen();
+			}
+		  } else {
+			// Vollbildmodus verlassen (falls bereits aktiv)
+			if (document.exitFullscreen) {
+			  document.exitFullscreen();
+			} else if (document.webkitExitFullscreen) {
+			  document.webkitExitFullscreen();
+			}
+		  }
+		}
+
+		// click deckt sowohl Desktop-Klicks als auch Mobile-Touch-Events zuverlässig ab
+		element.addEventListener('click', toggleFullscreen);
+	  </script>
+</body>
+</html>
