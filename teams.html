@@ -462,7 +462,7 @@
             <span class="app-icon"><img src="grafics/Kalendar.png"></span>
             <span>Kalender</span>
         </div>
-        <div class="app-item">
+        <div class="app-item" onclick="openPopup()">
             <span class="app-icon"><img src="grafics/more.png"></span>
             <span>Mehr</span>
         </div>
@@ -701,5 +701,274 @@
 		// click deckt sowohl Desktop-Klicks als auch Mobile-Touch-Events zuverlässig ab
 		element.addEventListener('click', toggleFullscreen);
 	  </script>
+
+	<style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #111214;
+            color: white;
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Öffnen-Button */
+        .open-button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+
+            background: #2c2f33;
+            color: white;
+
+            font-size: 16px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: all 0.25s ease;
+        }
+
+        .open-button:hover {
+            background: #3a3e43;
+            transform: translateY(-2px);
+        }
+
+
+        /* Dunkler Hintergrund */
+        .overlay {
+            position: fixed;
+            inset: 0;
+
+            background: rgba(0, 0, 0, 0.65);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition: opacity 0.3s ease,
+                        visibility 0.3s ease;
+
+            backdrop-filter: blur(6px);
+
+            z-index: 1000;
+        }
+
+        /* Overlay sichtbar */
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+
+        /* Pop-up */
+        .popup {
+            width: min(90%, 600px);
+
+            /* ca. 30% der Bildschirmhöhe */
+            min-height: 30vh;
+
+            background: #292b2f;
+
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            border-radius: 20px;
+
+            padding: 28px;
+
+            position: relative;
+
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, 0.5);
+
+            transform: scale(0.92) translateY(20px);
+
+            transition: transform 0.3s ease;
+        }
+
+        .overlay.active .popup {
+            transform: scale(1) translateY(0);
+        }
+
+
+        /* Schließen */
+        .close-button {
+            position: absolute;
+
+            top: 15px;
+            right: 18px;
+
+            width: 35px;
+            height: 35px;
+
+            border: none;
+            border-radius: 50%;
+
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+
+            font-size: 22px;
+            line-height: 35px;
+
+            cursor: pointer;
+
+            transition: background 0.2s ease;
+        }
+
+        .close-button:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+
+        /* Titel */
+        .popup-title {
+            text-align: center;
+
+            font-size: clamp(24px, 4vw, 34px);
+
+            font-weight: 700;
+
+            margin-bottom: 25px;
+
+            letter-spacing: -0.5px;
+        }
+
+
+        /* Bilder */
+        .images {
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+
+            gap: 18px;
+        }
+
+        .images img {
+            display: block;
+
+            max-width: 100%;
+            max-height: 100px;
+
+            object-fit: contain;
+
+            border-radius: 10px;
+        }
+
+        /* Erstes transparentes Bild */
+        .transparent-image {
+            max-height: 70px !important;
+        }
+
+        /* Team-Bild */
+        .team-image {
+            max-height: 130px !important;
+        }
+
+
+        /* Mobile */
+        @media (max-width: 600px) {
+            .popup {
+                width: 92%;
+                min-height: 30vh;
+
+                padding: 24px 18px;
+                border-radius: 16px;
+            }
+
+            .popup-title {
+                margin-bottom: 20px;
+            }
+        }
+    
+</style>
+
+    <!-- POP-UP OVERLAY -->
+    <div class="overlay" id="teamOverlay">
+
+        <div class="popup">
+
+            <!-- Schließen -->
+            <button class="close-button" onclick="closePopup()">
+                ×
+            </button>
+
+
+            <!-- Titel -->
+            <h2 class="popup-title">
+                Ivan Teams
+            </h2>
+
+
+            <!-- Bilder -->
+            <div class="images">
+
+                <!-- HIER DEIN TRANSPARENTES BILD EINFÜGEN -->
+                <img
+                    src="transparent-bild.png"
+                    alt="Ivan Teams Logo"
+                    class="transparent-image"
+                >
+
+                <!-- HIER DEIN TEAM-BILD EINFÜGEN -->
+                <img
+                    src="team-bild.jpg"
+                    alt="Unser Team"
+                    class="team-image"
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        const overlay = document.getElementById("teamOverlay");
+
+
+        function openPopup() {
+            overlay.classList.add("active");
+        }
+
+
+        function closePopup() {
+            overlay.classList.remove("active");
+        }
+
+
+        // Schließen, wenn außerhalb des Pop-ups geklickt wird
+        overlay.addEventListener("click", function(event) {
+
+            if (event.target === overlay) {
+                closePopup();
+            }
+
+        });
+
+
+        // ESC zum Schließen
+        document.addEventListener("keydown", function(event) {
+
+            if (event.key === "Escape") {
+                closePopup();
+            }
+
+        });
+
+	</script>
 </body>
 </html>
